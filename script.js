@@ -30,24 +30,45 @@ function displayItems() {
     const tableBody = document.getElementById('itemList');
     tableBody.innerHTML = "";
     
-    const items = JSON.parse(localStorage.getItem('hsd_items')) || [];
+    let items = JSON.parse(localStorage.getItem('hsd_items')) || [];
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // Lấy giá trị từ các ô chọn Sort
+    const sortField = document.getElementById('sortField').value;
+    const sortOrder = document.getElementById('sortOrder').value;
+
+    // LOGIC SẮP XẾP
+    items.sort((a, b) => {
+        let valA, valB;
+
+        if (sortField === 'name') {
+            valA = a.name.toLowerCase();
+            valB = b.name.toLowerCase();
+        } else if (sortField === 'date' || sortField === 'diff') {
+            // Cả ngày hết hạn và số ngày còn lại đều dựa trên giá trị thời gian
+            valA = new Date(a.date).getTime();
+            valB = new Date(b.date).getTime();
+        }
+
+        if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+        if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    // VẼ BẢNG SAU KHI ĐÃ SORT
     items.forEach(item => {
-        // 1. Xử lý tính toán (giữ nguyên đối tượng Date)
         const expDate = new Date(item.date);
         const diffTime = expDate - today;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        // 2. ĐỊNH DẠNG LẠI NGÀY HIỂN THỊ (dd/mm/yy)
+        // Định dạng dd/mm/yy để hiển thị
         const day = String(expDate.getDate()).padStart(2, '0');
         const month = String(expDate.getMonth() + 1).padStart(2, '0');
-        const year = String(expDate.getFullYear()).slice(-2); // Lấy 2 số cuối của năm
+        const year = String(expDate.getFullYear()).slice(-2);
         const formattedDate = `${day}/${month}/${year}`;
 
         let statusText, statusClass, countdownDisplay;
-
         if (diffDays < 0) {
             statusText = "Đã hết hạn";
             statusClass = "status-expired";
@@ -65,7 +86,8 @@ function displayItems() {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${item.name}</td>
-            <td>${formattedDate}</td> <td>${countdownDisplay}</td>
+            <td>${formattedDate}</td>
+            <td>${countdownDisplay}</td>
             <td><span class="status ${statusClass}">${statusText}</span></td>
             <td><button class="delete-btn" onclick="deleteItem(${item.id})">Xóa</button></td>
         `;

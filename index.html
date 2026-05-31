@@ -23,6 +23,20 @@
             <input type="file" id="fileInput" style="display:none" accept=".xlsx, .xls" onchange="importFromExcel(event)">
         </div>
 
+        <div class="sort-section">
+            <label for="sortField">Sắp xếp theo:</label>
+            <select id="sortField" onchange="displayItems()">
+                <option value="name">Tên món hàng</option>
+                <option value="date">Ngày hết hạn</option>
+                <option value="diff">Số ngày còn lại</option>
+            </select>
+
+            <select id="sortOrder" onchange="displayItems()">
+                <option value="asc">Tăng dần (A-Z, Gần nhất)</option>
+                <option value="desc">Giảm dần (Z-A, Xa nhất)</option>
+            </select>
+        </div>
+
         <table id="itemTable">
             <thead>
                 <tr>
@@ -36,6 +50,8 @@
             <tbody id="itemList">
                 </tbody>
         </table>
+
+
     </div>
     <script src="script.js"></script>
 </body>
