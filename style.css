@@ -104,3 +104,36 @@ th { background-color: #f8f9fa; color: #555; }
     border-radius: 4px;
     border: 1px solid #ccc;
 }
+
+.search-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.search-btn { background-color: #f39c12; color: white; }
+.clear-btn { background-color: #bdc3c7; color: white; }
+
+.result-block {
+    background: #fff9db; /* Màu nền vàng nhạt để phân biệt */
+    border: 2px solid #f39c12;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.5s;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ffeaa7;
+}
+
+.result-item:last-child { border-bottom: none; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

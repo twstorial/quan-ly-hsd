@@ -55,6 +55,18 @@
                 </tbody>
         </table>
 
+        <!-- Phần tìm kiếm -->
+        <div class="search-section">
+            <input type="text" id="searchInput" placeholder="Nhập tên món hàng cần tìm...">
+            <button onclick="searchItem()" class="search-btn">🔍 Tìm kiếm</button>
+            <button onclick="clearSearch()" class="clear-btn">Làm mới</button>
+        </div>
+
+        <div id="searchResultBlock" class="result-block" style="display: none;">
+            <h3>🎯 Kết quả tìm kiếm</h3>
+            <div id="searchResultContent"></div>
+        </div>
+
 
     </div>
     <script src="script.js"></script>

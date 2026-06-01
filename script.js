@@ -95,13 +95,13 @@ function displayItems() {
     });
 }
 
-// 3. Xóa món hàng
-function deleteItem(id) {
-    let items = JSON.parse(localStorage.getItem('hsd_items')) || [];
-    items = items.filter(item => item.id !== id);
-    localStorage.setItem('hsd_items', JSON.stringify(items));
-    displayItems();
-}
+// // 3. Xóa món hàng
+// function deleteItem(id) {
+//     let items = JSON.parse(localStorage.getItem('hsd_items')) || [];
+//     items = items.filter(item => item.id !== id);
+//     localStorage.setItem('hsd_items', JSON.stringify(items));
+//     displayItems();
+// }
 
 // 4. XUẤT FILE EXCEL (Lưu vào folder máy)
 function exportToExcel() {
@@ -151,4 +151,74 @@ function importFromExcel(event) {
         event.target.value = ''; // Reset input
     };
     reader.readAsArrayBuffer(file);
+}
+
+// 6. Hàm tìm kiếm món hàng
+function searchItem() {
+    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+    const resultBlock = document.getElementById('searchResultBlock');
+    const resultContent = document.getElementById('searchResultContent');
+    
+    if (!keyword) {
+        alert("Vui lòng nhập từ khóa tìm kiếm!");
+        return;
+    }
+
+    const items = JSON.parse(localStorage.getItem('hsd_items')) || [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Lọc các món hàng có tên chứa từ khóa
+    const filteredItems = items.filter(item => item.name.toLowerCase().includes(keyword));
+
+    if (filteredItems.length === 0) {
+        resultContent.innerHTML = "<p>Không tìm thấy món hàng nào phù hợp.</p>";
+    } else {
+        resultContent.innerHTML = ""; // Xóa kết quả cũ
+        filteredItems.forEach(item => {
+            const expDate = new Date(item.date);
+            const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+            
+            // Định dạng dd/mm/yy
+            const day = String(expDate.getDate()).padStart(2, '0');
+            const month = String(expDate.getMonth() + 1).padStart(2, '0');
+            const year = String(expDate.getFullYear()).slice(-2);
+            const formattedDate = `${day}/${month}/${year}`;
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'result-item';
+            itemDiv.innerHTML = `
+                <div>
+                    <strong>${item.name}</strong> - <small>HSD: ${formattedDate}</small>
+                </div>
+                <div>
+                    <span class="countdown-text">${diffDays < 0 ? 'Hết hạn' : diffDays + ' ngày nữa'}</span>
+                </div>
+            `;
+            resultContent.appendChild(itemDiv);
+        });
+    }
+
+    resultBlock.style.display = "block"; // Hiển thị block kết quả
+}
+
+// 6.2. Hàm làm mới (ẩn block tìm kiếm)
+function clearSearch() {
+    document.getElementById('searchInput').value = "";
+    document.getElementById('searchResultBlock').style.display = "none";
+}
+
+// Lưu ý: Cần chỉnh sửa lại hàm deleteItem một chút 
+// để nếu đang mở tìm kiếm mà xóa thì nó cập nhật cả hai.
+function deleteItem(id) {
+    let items = JSON.parse(localStorage.getItem('hsd_items')) || [];
+    items = items.filter(item => item.id !== id);
+    localStorage.setItem('hsd_items', JSON.stringify(items));
+    
+    displayItems(); // Cập nhật bảng chính
+    
+    // Nếu block tìm kiếm đang mở, thực hiện lại tìm kiếm để cập nhật
+    if (document.getElementById('searchResultBlock').style.display === "block") {
+        searchItem();
+    }
 }
