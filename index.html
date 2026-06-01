@@ -11,18 +11,21 @@
     <div class="container">
         <h2>📦 Quản Lý Hạn Sử Dụng</h2>
         
+        <!-- Phần nhập liệu -->
         <div class="input-section">
             <input type="text" id="itemName" placeholder="Tên món hàng...">
             <input type="date" id="expiryDate">
             <button onclick="addItem()" class="add-btn">Thêm Mới</button>
         </div>
 
+        <!-- Phần hành động -->
         <div class="action-section">
             <button onclick="exportToExcel()" class="export-btn">💾 Lưu Thành File Excel</button>
             <button onclick="document.getElementById('fileInput').click()" class="load-btn">📂 Tải File Từ Máy</button>
             <input type="file" id="fileInput" style="display:none" accept=".xlsx, .xls" onchange="importFromExcel(event)">
         </div>
 
+        <!-- Phần sắp xếp  -->
         <div class="sort-section">
             <label for="sortField">Sắp xếp theo:</label>
             <select id="sortField" onchange="displayItems()">
@@ -37,6 +40,7 @@
             </select>
         </div>
 
+        <!-- Bảng danh sách món hàng -->
         <table id="itemTable">
             <thead>
                 <tr>
