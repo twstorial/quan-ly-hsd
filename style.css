@@ -45,6 +45,12 @@ button {
 .export-btn { background-color: #007bff; color: white; }
 .load-btn { background-color: #6c757d; color: white; }
 
+.refresh-btn {
+    background-color: #c0392b; /* Màu đỏ đậm cảnh báo */
+    color: white;
+}
+.refresh-btn:hover { background-color: #a93226; }
+
 button:hover { opacity: 0.8; }
 
 table {

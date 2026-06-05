@@ -22,7 +22,7 @@
         <div class="action-section">
             <button onclick="exportToExcel()" class="export-btn">💾 Lưu Thành File Excel</button>
             <button onclick="document.getElementById('fileInput').click()" class="load-btn">📂 Tải File Từ Máy</button>
-            <input type="file" id="fileInput" style="display:none" accept=".xlsx, .xls" onchange="importFromExcel(event)">
+            <button onclick="clearAllItems()" class="refresh-btn">🗑️ Xóa Tất Cả</button> <input type="file" id="fileInput" style="display:none" accept=".xlsx, .xls" onchange="importFromExcel(event)">
         </div>
 
         <!-- Phần sắp xếp  -->

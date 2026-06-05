@@ -133,22 +133,35 @@ function importFromExcel(event) {
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-        const items = JSON.parse(localStorage.getItem('hsd_items')) || [];
+        if (jsonData.length === 0) {
+            alert("File không có dữ liệu!");
+            return;
+        }
+
+        // BƯỚC THAY ĐỔI: Tạo một mảng trống mới hoàn toàn (Xóa sạch bộ nhớ cũ)
+        const newItems = [];
 
         jsonData.forEach(row => {
             if (row["Tên Hàng"] && row["Ngày Hết Hạn"]) {
-                items.push({
-                    id: Date.now() + Math.random(),
+                newItems.push({
+                    id: Date.now() + Math.random(), // Tạo ID mới cho các món
                     name: row["Tên Hàng"],
                     date: row["Ngày Hết Hạn"]
                 });
             }
         });
 
-        localStorage.setItem('hsd_items', JSON.stringify(items));
-        displayItems();
-        alert("Đã tải dữ liệu thành công!");
-        event.target.value = ''; // Reset input
+        // Ghi đè mảng mới này vào localStorage
+        localStorage.setItem('hsd_items', JSON.stringify(newItems));
+        
+        displayItems(); // Vẽ lại bảng
+        
+        // Nếu đang mở block tìm kiếm thì cập nhật hoặc đóng nó đi
+        document.getElementById('searchResultBlock').style.display = "none";
+        document.getElementById('searchInput').value = "";
+
+        alert("Tải file thành công! Dữ liệu cũ đã được thay thế.");
+        event.target.value = ''; 
     };
     reader.readAsArrayBuffer(file);
 }
@@ -211,14 +224,57 @@ function clearSearch() {
 // Lưu ý: Cần chỉnh sửa lại hàm deleteItem một chút 
 // để nếu đang mở tìm kiếm mà xóa thì nó cập nhật cả hai.
 function deleteItem(id) {
-    let items = JSON.parse(localStorage.getItem('hsd_items')) || [];
-    items = items.filter(item => item.id !== id);
-    localStorage.setItem('hsd_items', JSON.stringify(items));
-    
-    displayItems(); // Cập nhật bảng chính
-    
-    // Nếu block tìm kiếm đang mở, thực hiện lại tìm kiếm để cập nhật
-    if (document.getElementById('searchResultBlock').style.display === "block") {
-        searchItem();
+    // 1. Lấy thông tin món hàng dựa trên ID để hiển thị trong thông báo cho rõ ràng
+    const items = JSON.parse(localStorage.getItem('hsd_items')) || [];
+    const itemToDelete = items.find(item => item.id === id);
+    const itemName = itemToDelete ? itemToDelete.name : "món hàng này";
+
+    // 2. Hiển thị hộp thoại xác nhận (Confirm)
+    const isConfirmed = confirm(`Bạn có chắc chắn muốn xóa món hàng "${itemName}" không?`);
+
+    // 3. Nếu người dùng đồng ý (bấm OK) thì tiến hành xóa
+    if (isConfirmed) {
+        const updatedItems = items.filter(item => item.id !== id);
+        localStorage.setItem('hsd_items', JSON.stringify(updatedItems));
+        
+        displayItems(); // Cập nhật lại bảng chính
+        
+        // Nếu block tìm kiếm đang mở, thực hiện lại tìm kiếm để cập nhật giao diện tìm kiếm
+        if (document.getElementById('searchResultBlock').style.display === "block") {
+            // Kiểm tra xem từ khóa hiện tại còn khớp món nào không
+            const keyword = document.getElementById('searchInput').value.trim();
+            if (keyword) {
+                searchItem();
+            }
+        }
+    }
+    // Nếu người dùng bấm Cancel (Hủy), hàm sẽ dừng tại đây và không xóa gì cả.
+}
+
+// 7. Hàm xóa toàn bộ danh sách (Clear All)
+function clearAllItems() {
+    // 1. Kiểm tra xem hiện tại có dữ liệu để xóa hay không
+    const items = JSON.parse(localStorage.getItem('hsd_items')) || [];
+    if (items.length === 0) {
+        alert("Danh sách hiện tại đã trống sẵn rồi!");
+        return;
+    }
+
+    // 2. Hiển thị hộp thoại xác nhận (Confirm) với nội dung cảnh báo mạnh hơn
+    const isConfirmed = confirm("⚠️ CẢNH BÁO: Bạn có chắc chắn muốn XÓA TOÀN BỘ danh sách món hàng không? \nHành động này không thể hoàn tác trừ khi bạn đã lưu file Excel!");
+
+    // 3. Nếu đồng ý, tiến hành xóa sạch bộ nhớ và giao diện
+    if (isConfirmed) {
+        // Xóa hoàn toàn key dữ liệu trong localStorage
+        localStorage.removeItem('hsd_items');
+        
+        // Vẽ lại bảng trống
+        displayItems();
+        
+        // Đóng và xóa thanh tìm kiếm nếu đang mở
+        document.getElementById('searchResultBlock').style.display = "none";
+        document.getElementById('searchInput').value = "";
+        
+        alert("Đã xóa sạch toàn bộ danh sách thành công. Bạn có thể tạo danh sách mới!");
     }
 }
